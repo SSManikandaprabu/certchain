@@ -1,5 +1,11 @@
 # 🛡️ CertChain — Polygon Layer-2 Academic Credentialing & Cryptographic Verification Platform
 
+🌐 **Live Production Deployment**: **[https://certchain-six.vercel.app/](https://certchain-six.vercel.app/)**
+- **Public Verification Gateway**: [https://certchain-six.vercel.app/verify](https://certchain-six.vercel.app/verify)
+- **Graduate Credential Wallet**: [https://certchain-six.vercel.app/wallet](https://certchain-six.vercel.app/wallet)
+- **Enterprise REST API Playground**: [https://certchain-six.vercel.app/docs](https://certchain-six.vercel.app/docs)
+- **Master Admin Console**: [https://certchain-six.vercel.app/dashboard](https://certchain-six.vercel.app/dashboard) *(Login at [/login](https://certchain-six.vercel.app/login) with 1-Click Demo Credentials)*
+
 **CertChain** is an enterprise B2B SaaS academic credentialing platform and public verification gateway anchored on **Polygon PoS Layer-2**. It empowers universities to issue tamper-proof digital diplomas in bulk via **SHA-256 Binary Merkle Trees** and enables employers worldwide to verify any PDF certificate in under 2 seconds with zero accounts, zero server uploads, and 100% immunity to AI forgery.
 
 ---
