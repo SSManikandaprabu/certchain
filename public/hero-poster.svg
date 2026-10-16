@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1487 1058" width="100%" height="100%">
+  <defs>
+    <radialGradient id="portalGlow" cx="50%" cy="45%" r="35%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="15%" stop-color="#e2e8f0" stop-opacity="0.5"/>
+      <stop offset="40%" stop-color="#38bdf8" stop-opacity="0.15"/>
+      <stop offset="70%" stop-color="#0a0f1d" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="portalBeam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#e2e8f0" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="groundFog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#050505" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#050505" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#050505" />
+  <circle cx="743" cy="460" r="420" fill="url(#portalGlow)" />
+  <!-- Vertical Light Portal -->
+  <rect x="735" y="240" width="17" height="380" rx="3" fill="url(#portalBeam)" opacity="0.95" filter="drop-shadow(0 0 25px rgba(255,255,255,0.9))" />
+  <!-- Distant silhouetted ground and mist -->
+  <ellipse cx="743.5" cy="620" rx="460" ry="24" fill="#0c1017" opacity="0.6"/>
+  <!-- Silhouetted walking figure -->
+  <ellipse cx="743.5" cy="592" rx="4.5" ry="5.5" fill="#050505" />
+  <path d="M738 599 L749 599 L747 621 L740 621 Z" fill="#050505" />
+  <rect width="100%" height="100%" fill="url(#groundFog)" />
+</svg>

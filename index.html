@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-[#050505] text-[#FAFAFA]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CertChain | Tamper-proof certificates, verified in 5 seconds.</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@200;300;400;500;600&family=Manrope:wght@400;500;700&family=Sora:wght@200;300;400;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PDF.js CDN for in-browser client-side parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: "#050505",
+            surface: "#0E0E10",
+            border: "rgba(255, 255, 255, 0.08)",
+            ink: "#FAFAFA",
+            muted: "#A7A6A6",
+            nav: "#B6B5B5",
+            accent: {
+              emerald: "#10B981",
+              red: "#EF4444",
+            },
+          },
+          fontFamily: {
+            sans: ["Manrope", "sans-serif"],
+            serif: ["Instrument Serif", "Georgia", "serif"],
+            mono: ["JetBrains Mono", "monospace"],
+            sora: ["Sora", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --u: calc(100dvh / 1058);
+      --uw: calc(100vw / 1487);
+      --h: clamp(var(--u), calc(var(--u) * 0.65 + var(--uw) * 0.35), calc(var(--u) * 1.16));
+    }
+    body {
+      background-color: #050505;
+      color: #FAFAFA;
+      font-family: 'Manrope', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FAFAFA;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050505;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    
+    .hero-desktop-canvas { display: none; }
+    .hero-mobile-canvas { display: flex; }
+    @media (min-width: 900px) and (min-aspect-ratio: 11/10) {
+      .hero-desktop-canvas { display: block; }
+      .hero-mobile-canvas { display: none; }
+    }
+
+    @keyframes rotateSeal {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .rotating-seal {
+      animation: rotateSeal 24s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rotating-seal { animation: none !important; }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body class="bg-bg text-ink min-h-screen">
+
+  <!-- ============================================================ -->
+  <!-- STICKY GLASS NAVBAR (Emerges on scroll) -->
+  <!-- ============================================================ -->
+  <header id="sticky-navbar" class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#050505]/85 border-b border-white/[0.08] transition-all duration-300 -translate-y-full opacity-0">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3 group">
+        <svg class="w-[20px] h-[30px]" viewBox="0 0 32 49" fill="none">
+          <path d="M16 1.2 L30 6.8 C30 22.5 24.2 38.6 16 47.8 C7.8 38.6 2 22.5 2 6.8 L16 1.2 Z" fill="#0A0A0C" stroke="#cccccc" stroke-width="1.8" />
+          <path d="M10 24.2 L14.2 28.5 L22.4 18.2" fill="none" stroke="#cccccc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="16" cy="34" r="1.1" fill="#10B981" />
+        </svg>
+        <span class="font-semibold text-ink tracking-tight text-lg">CertChain</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-sm text-nav font-normal">
+        <a href="#features" class="hover:text-ink transition-colors">Features</a>
+        <a href="#how-it-works" class="hover:text-ink transition-colors">How it works</a>
+        <a href="#pricing" class="hover:text-ink transition-colors">Pricing</a>
+        <a href="#verify-demo" class="hover:text-ink transition-colors">Verify</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="#verify-demo" class="hidden sm:inline-flex text-xs font-medium text-muted hover:text-ink px-3 py-1.5 transition-colors">Verify PDF</a>
+        <a href="#pricing" class="inline-flex items-center justify-center h-9 px-5 rounded-full bg-[#FAFAFA] text-[#050505] text-sm font-medium hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] transition-all">Start Free</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: HERO (1487x1058 Reference Canvas) -->
+  <!-- ============================================================ -->
+  <section class="relative w-full min-h-[100dvh] overflow-hidden bg-[#050505] text-[#FAFAFA] select-none">
+    
+    <!-- DESKTOP CANVAS (Aspect >= 11/10) -->
+    <div class="hero-desktop-canvas relative w-full h-[100dvh] overflow-hidden">
+      <!-- Looping Video -->
+      <video autoplay muted loop playsinline preload="auto" poster="hero-poster.svg" class="absolute pointer-events-none object-cover"
+        style="top: calc(1 * var(--u)); left: 50%; width: calc(1492 * var(--u)); height: calc(1054 * var(--u)); transform: translateX(calc(-50% - 0.5 * var(--u)));">
+        <source src="hero.mp4" type="video/mp4" />
+      </video>
+
+      <!-- Overlay 1: Bottom Fade -->
+      <div class="absolute inset-0 pointer-events-none"
+        style="background: linear-gradient(to bottom, transparent 0%, transparent 78.8%, rgba(5,5,5,0.23) 79.6%, rgba(5,5,5,0.45) 81.4%, rgba(5,5,5,0.75) 83.3%, rgba(5,5,5,0.84) 85.2%, rgba(5,5,5,0.888) 88%, rgba(5,5,5,0.905) 91%, rgba(5,5,5,0.96) 95%, #050505 100%);">
+      </div>
+
+      <!-- Overlay 2: Side Letterbox -->
+      <div class="absolute inset-0 pointer-events-none"
+        style="background: linear-gradient(to right, #050505 0%, #050505 calc(50% - 746 * var(--u)), transparent calc(50% - 676 * var(--u)), transparent calc(50% + 676 * var(--u)), #050505 calc(50% + 746 * var(--u)), #050505 100%);">
+      </div>
+
+      <!-- Brand Mark -->
+      <div class="absolute z-20 flex items-center"
+        style="left: calc(75 * var(--u)); top: calc(27 * var(--u)); width: calc(31.5 * var(--u)); height: calc(48.5 * var(--u));">
+        <svg viewBox="0 0 32 49" fill="none" class="w-full h-full">
+          <defs>
+            <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9e9e9e" />
+              <stop offset="50%" stop-color="#cccccc" />
+              <stop offset="100%" stop-color="#7a7a7a" />
+            </linearGradient>
+          </defs>
+          <path d="M16 1.2 L30 6.8 C30 22.5 24.2 38.6 16 47.8 C7.8 38.6 2 22.5 2 6.8 L16 1.2 Z" fill="#0A0A0C" stroke="url(#shieldGrad)" stroke-width="1.8" />
+          <path d="M10 24.2 L14.2 28.5 L22.4 18.2" fill="none" stroke="url(#shieldGrad)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+          <rect x="6" y="5.8" width="3.2" height="1.5" rx="0.5" transform="rotate(22 6 5.8)" fill="#fdfdfd" />
+          <rect x="23" y="7" width="3.2" height="1.5" rx="0.5" transform="rotate(-22 23 7)" fill="#fdfdfd" />
+          <circle cx="16" cy="34" r="1.1" fill="#10B981" />
+        </svg>
+      </div>
+
+      <!-- Centered Nav -->
+      <nav class="absolute z-20 flex items-center justify-center font-sans"
+        style="left: 50%; top: calc(51 * var(--u)); transform: translate(-50%, -50%); gap: calc(24 * var(--u)); font-size: calc(19 * var(--u)); color: #B6B5B5; font-weight: 400;">
+        <a href="#features" class="hover:text-ink transition-colors">Features</a>
+        <a href="#how-it-works" class="hover:text-ink transition-colors">How it works</a>
+        <a href="#pricing" class="hover:text-ink transition-colors">Pricing</a>
+        <a href="#verify-demo" class="hover:text-ink transition-colors">Verify</a>
+      </nav>
+
+      <!-- Header Pill -->
+      <div class="absolute z-20"
+        style="right: calc(75 * var(--u)); top: calc(27 * var(--u)); width: calc(175 * var(--u)); height: calc(49 * var(--u));">
+        <a href="#pricing" class="w-full h-full flex items-center justify-center rounded-full bg-[#FAFAFA] text-[#050505] font-sans font-medium hover:bg-white hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] transition-all"
+          style="font-size: calc(20.6 * var(--u));">
+          Start Free
+        </a>
+      </div>
+
+      <!-- Headline (Manrope 400) -->
+      <h1 class="absolute z-20 font-sans text-[#FAFAFA] font-normal leading-none"
+        style="left: calc(75.5 * var(--u)); top: calc(230.5 * var(--u)); font-size: calc(71.6 * var(--h)); line-height: calc(80.5 * var(--h)); letter-spacing: calc(0.3 * var(--h));">
+        <span class="block">Certificates nobody</span>
+        <span class="block">can fake.</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="absolute z-20 font-sans"
+        style="left: calc(75.5 * var(--u)); top: calc(230.5 * var(--u) + 189 * var(--h)); font-size: calc(20.7 * var(--h)); line-height: calc(23.5 * var(--h)); color: #A7A6A6;">
+        <span class="block">Issue tamper-proof certificates in bulk and verify</span>
+        <span class="block">any PDF in 5 seconds. No blockchain knowledge needed.</span>
+      </p>
+
+      <!-- Primary CTA -->
+      <div class="absolute z-20"
+        style="left: calc(74.9 * var(--u)); top: calc(230.5 * var(--u) + 264.5 * var(--h)); width: calc(175.6 * var(--h)); height: calc(50 * var(--h));">
+        <a href="#pricing" class="w-full h-full flex items-center justify-center rounded-full bg-[#FAFAFA] text-[#050505] font-sans font-medium hover:bg-white hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] transition-all"
+          style="font-size: calc(20.6 * var(--h));">
+          Start Free
+        </a>
+      </div>
+
+      <!-- Ghost Link -->
+      <div class="absolute z-20 flex items-center"
+        style="left: calc(74.9 * var(--u) + 220.6 * var(--h)); top: calc(230.5 * var(--u) + 279.5 * var(--h));">
+        <a href="#verify-demo" class="font-sans font-medium text-white hover:text-white/80 transition-colors flex items-center gap-2 group"
+          style="font-size: calc(20.6 * var(--h));">
+          <span>Verify a Certificate</span>
+          <span class="text-white/60 group-hover:translate-x-1 transition-transform">→</span>
+        </a>
+      </div>
+
+      <!-- Bottom Trust Strip -->
+      <div class="absolute z-20 flex items-center justify-center font-sans"
+        style="left: 50%; top: calc(995 * var(--u)); transform: translateX(-50%); gap: calc(36 * var(--u)); color: #8B8A8A; font-size: calc(15.5 * var(--u));">
+        <div class="flex items-center gap-2 hover:text-[#FAFAFA] transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 38 33" fill="currentColor"><path d="M29 10.2c-1.3-.8-3-.8-4.3 0l-4.5 2.6-3.1 1.8-4.5 2.6c-1.3.8-3 .8-4.3 0l-3.9-2.3c-1.3-.8-2.1-2.2-2.1-3.7V6.7c0-1.5.8-2.9 2.1-3.7l3.9-2.3c1.3-.8 3-.8 4.3 0l3.9 2.3c1.3.8 2.1 2.2 2.1 3.7v2.3l3.1-1.8V5c0-1.5-.8-2.9-2.1-3.7L18 .2C16.7-.6 15-.6 13.7.2L5.8 4.8C4.5 5.6 3.7 7 3.7 8.5v9.1c0 1.5.8 2.9 2.1 3.7l7.9 4.6c1.3.8 3 .8 4.3 0l4.5-2.6 3.1-1.8 4.5-2.6c1.3-.8 3-.8 4.3 0l3.9 2.3c1.3.8 2.1 2.2 2.1 3.7v4.6c0 1.5-.8 2.9-2.1 3.7l-3.9 2.3c-1.3.8-3 .8-4.3 0l-3.9-2.3c-1.3-.8-2.1-2.2-2.1-3.7v-2.3l-3.1 1.8v2.3c0 1.5.8 2.9 2.1 3.7l7.9 4.6c1.3.8 3 .8 4.3 0l7.9-4.6c1.3-.8 2.1-2.2 2.1-3.7v-9.1c0-1.5-.8-2.9-2.1-3.7L29 10.2z"/></svg>
+          <span>Polygon</span>
+        </div>
+        <div class="w-1 h-1 rounded-full bg-white/10"></div>
+        <div class="flex items-center gap-2 hover:text-[#FAFAFA] transition-colors">
+          <span>#</span>
+          <span>SHA-256</span>
+        </div>
+        <div class="w-1 h-1 rounded-full bg-white/10"></div>
+        <div class="flex items-center gap-2 hover:text-[#FAFAFA] transition-colors">
+          <span>⌘</span>
+          <span>Merkle Proofs</span>
+        </div>
+        <div class="w-1 h-1 rounded-full bg-white/10"></div>
+        <div class="flex items-center gap-2 hover:text-[#FAFAFA] transition-colors">
+          <span class="text-[#10B981]">✓</span>
+          <span>PolygonScan Verified</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE FLOW VIEW (Aspect < 11/10) -->
+    <div class="hero-mobile-canvas relative w-full min-h-[100dvh] flex-col justify-between px-6 py-6 overflow-hidden">
+      <video autoplay muted loop playsinline preload="auto" poster="hero-poster.svg" class="absolute inset-0 w-full h-full object-cover pointer-events-none" style="object-position: 43% center;">
+        <source src="hero.mp4" type="video/mp4" />
+      </video>
+      <div class="absolute inset-0 bg-gradient-to-b from-[#050505]/80 via-[#050505]/50 to-[#050505] pointer-events-none"></div>
+
+      <!-- Mobile Top Bar -->
+      <div class="relative z-30 flex items-center justify-between w-full pt-2">
+        <a href="#" class="flex items-center gap-2.5">
+          <svg class="w-7 h-10" viewBox="0 0 32 49" fill="none"><path d="M16 1.2 L30 6.8 C30 22.5 24.2 38.6 16 47.8 C7.8 38.6 2 22.5 2 6.8 L16 1.2 Z" fill="#0A0A0C" stroke="#ccc" stroke-width="1.8" /><path d="M10 24.2 L14.2 28.5 L22.4 18.2" fill="none" stroke="#ccc" stroke-width="2.4" stroke-linecap="round" /><circle cx="16" cy="34" r="1.1" fill="#10B981" /></svg>
+          <span class="font-semibold text-ink tracking-tight text-lg">CertChain</span>
+        </a>
+        <a href="#pricing" class="px-4 py-1.5 rounded-full bg-white text-black text-xs font-medium">Start Free</a>
+      </div>
+
+      <!-- Mobile Content -->
+      <div class="relative z-20 my-auto pt-16 pb-12 flex flex-col">
+        <h1 class="text-4xl sm:text-5xl font-normal tracking-tight text-[#FAFAFA] leading-[1.12]">
+          Certificates nobody <br /> can fake.
+        </h1>
+        <p class="mt-5 text-base text-[#A7A6A6] leading-relaxed max-w-md">
+          Issue tamper-proof certificates in bulk and verify any PDF in 5 seconds. No blockchain knowledge needed.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <a href="#pricing" class="h-12 px-7 rounded-full bg-[#FAFAFA] text-[#050505] font-medium flex items-center justify-center text-base hover:bg-white transition-all">Start Free</a>
+          <a href="#verify-demo" class="h-12 px-5 flex items-center justify-center text-white/90 font-medium text-base">Verify a Certificate →</a>
+        </div>
+      </div>
+
+      <!-- Mobile 2x2 Trust Grid -->
+      <div class="relative z-20 grid grid-cols-2 gap-3 text-xs text-[#8B8A8A] pt-4 border-t border-white/[0.06]">
+        <div>Polygon Layer-2</div>
+        <div>SHA-256 Digest</div>
+        <div>Merkle Proofs</div>
+        <div class="text-[#10B981]">✓ PolygonScan Verified</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: LIVE VERIFY DEMO -->
+  <!-- ============================================================ -->
+  <section id="verify-demo" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-5xl mx-auto flex flex-col items-center">
+      <div class="text-center max-w-3xl mb-14">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+          Live Verification Simulator
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Verify any certificate in 5 seconds.
+        </h2>
+        <p class="mt-4 text-base text-[#A7A6A6] max-w-2xl mx-auto leading-relaxed">
+          Recompute the document’s SHA-256 digest in your browser and check it against the Polygon Merkle tree. Zero personal data touches our servers.
+        </p>
+      </div>
+
+      <!-- Interactive Drop Zone -->
+      <div id="verify-container" class="w-full max-w-3xl">
+        <!-- Idle Drop Area -->
+        <input type="file" id="pdf-input" accept=".pdf" class="hidden" onchange="handleHtmlFile(event)" />
+        <div id="drop-zone" onclick="document.getElementById('pdf-input').click()" ondragover="event.preventDefault(); this.classList.add('border-[#10B981]');" ondragleave="this.classList.remove('border-[#10B981]');" ondrop="handleHtmlDrop(event)" class="rounded-2xl border-2 border-dashed border-white/15 hover:border-white/30 bg-[#0E0E10] p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-all">
+          <div class="w-16 h-16 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/80 mb-5">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <div class="text-lg font-medium text-white">Upload your own certificate PDF, or <span class="underline">browse files</span></div>
+          <div class="text-xs text-[#A7A6A6] mt-2 font-mono">Calculates genuine client-side SHA-256 fingerprint · Max 25MB · PDF only</div>
+
+          <div class="mt-8 flex flex-wrap gap-4 justify-center" onclick="event.stopPropagation()">
+            <button onclick="runSampleVerification(false)" class="px-5 py-2.5 rounded-full bg-white text-black text-xs font-medium hover:bg-white/90 transition-all flex items-center gap-2">
+              <span class="text-[#10B981]">✓</span> Try Sample (Sarah M. Jenkins)
+            </button>
+            <button onclick="runSampleVerification(true)" class="px-5 py-2.5 rounded-full bg-[#0E0E10] border border-red-500/40 text-red-300 text-xs font-medium hover:bg-red-950/20 transition-all">
+              Try a tampered sample
+            </button>
+          </div>
+        </div>
+
+        <!-- Verifying State -->
+        <div id="verifying-state" class="hidden rounded-2xl bg-[#0E0E10] border border-white/10 p-8">
+          <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+            <div class="flex items-center gap-3">
+              <span class="animate-spin text-xl">◌</span>
+              <div>
+                <h4 class="text-sm font-medium text-white">Computing Cryptographic Proof...</h4>
+                <div id="verifying-file-name" class="text-xs font-mono text-[#A7A6A6]">certchain-diploma-2026.pdf</div>
+              </div>
+            </div>
+            <span id="progress-text" class="font-mono text-sm font-bold text-white">25%</span>
+          </div>
+          <div class="w-full h-1.5 bg-white/10 rounded-full mt-6 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-[#10B981] transition-all duration-300" style="width: 25%"></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mt-6 text-xs font-mono">
+            <div class="p-3 rounded bg-white/[0.03] border border-white/5">Step 1: SHA-256 Hashing</div>
+            <div class="p-3 rounded bg-white/[0.03] border border-white/5">Step 2: Polygon L2 Query</div>
+            <div class="p-3 rounded bg-white/[0.03] border border-white/5">Step 3: Merkle Path Match</div>
+          </div>
+        </div>
+
+        <!-- Verified Result Card -->
+        <div id="verified-state" class="hidden rounded-2xl bg-[#0E0E10] border border-white/10 p-8 shadow-2xl">
+          <!-- Upload notice banner & View Switcher -->
+          <div class="mb-6 p-4 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+            <div id="uploaded-notice" class="flex items-center gap-2">
+              <span>Uploaded: <strong id="notice-file-name" class="text-white">my-file.pdf</strong> (<span id="notice-file-size">240 KB</span>)</span>
+            </div>
+            <!-- Tabs -->
+            <div class="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-white/10">
+              <button id="tab-btn-card" onclick="switchHtmlTab('card')" class="px-3 py-1 rounded-lg text-xs font-sans transition-all bg-white text-black font-medium">Verified Card</button>
+              <button id="tab-btn-doc" onclick="switchHtmlTab('doc')" class="px-3 py-1 rounded-lg text-xs font-sans transition-all text-white/60 hover:text-white">Original Document</button>
+              <button id="tab-btn-ocr" onclick="switchHtmlTab('ocr')" class="px-3 py-1 rounded-lg text-xs font-sans transition-all text-white/60 hover:text-white">Extracted OCR</button>
+            </div>
+          </div>
+
+          <!-- TAB 1: CARD VIEW -->
+          <div id="html-tab-card">
+            <div class="flex items-center justify-between pb-6 border-b border-white/[0.08]">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center font-bold">SC</div>
+                <div>
+                  <div id="card-institution" class="text-sm font-semibold text-white">Stanford Credentials Office</div>
+                  <div id="card-id-line" class="text-[11px] font-mono text-white/40">NODE #04 · REGISTRY V2</div>
+                </div>
+              </div>
+              <div class="px-3 py-1 rounded-full bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-mono font-medium">
+                ✓ VERIFIED AUTHENTIC
+              </div>
+            </div>
+
+            <div class="py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div class="flex-1 w-full">
+                <div class="text-xs font-mono uppercase tracking-widest text-[#A7A6A6]">Certificate of Competency</div>
+                
+                <div id="view-mode-details">
+                  <div class="flex items-center gap-3 mt-1">
+                    <div id="card-student-name" class="text-3xl font-medium text-white">Sarah M. Jenkins</div>
+                    <button onclick="toggleCardEdit(true)" title="Edit name & course" class="text-white/40 hover:text-white p-1 text-xs font-mono border border-white/10 rounded px-2">✏️ Edit</button>
+                  </div>
+                  <div id="card-course-name" class="text-sm text-white/90 mt-2">Advanced Distributed Systems & Cryptographic Proofs</div>
+                </div>
+
+                <div id="edit-mode-details" class="hidden flex flex-col gap-2 my-2">
+                  <input id="edit-student-input" type="text" placeholder="Candidate Name" class="bg-black/60 border border-white/20 p-2 text-xl font-medium text-white rounded outline-none" />
+                  <input id="edit-course-input" type="text" placeholder="Course / Degree Title" class="bg-black/60 border border-white/20 p-2 text-sm text-white/90 rounded outline-none" />
+                  <button onclick="saveCardEdit()" class="self-start text-xs font-mono text-[#10B981] hover:underline pt-1">✓ Save Details</button>
+                </div>
+
+                <div id="card-metadata" class="text-xs text-[#A7A6A6] mt-3 font-mono">Issued: Oct 08, 2026 · ID: CC-2026-94812</div>
+              </div>
+
+              <!-- Holographic Seal -->
+              <div class="relative w-28 h-28 flex items-center justify-center">
+                <div class="rotating-seal absolute inset-0 rounded-full border border-white/20 bg-gradient-to-tr from-white/5 via-[#10B981]/10 to-transparent flex items-center justify-center text-[7px] font-mono tracking-widest text-[#10B981] uppercase font-bold p-2">
+                  POLYGON VERIFIED · CERTCHAIN IMMUTABLE ·
+                </div>
+                <div class="w-12 h-12 rounded-full bg-black border border-[#10B981] flex items-center justify-center text-[#10B981] text-lg font-bold">✓</div>
+              </div>
+            </div>
+
+            <!-- Real SHA-256 Hash Display -->
+            <div class="p-3 bg-black/60 rounded-xl border border-white/[0.06] font-mono text-xs flex flex-col gap-1 mb-6">
+              <span class="text-white/40 text-[10px] uppercase">Computed SHA-256 Fingerprint:</span>
+              <code id="card-sha256" class="text-[#FAFAFA] text-[11px] break-all">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+            </div>
+
+            <!-- Timeline -->
+            <div class="pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div><span class="text-[#10B981]">✓</span> Issued: <span id="timeline-date">Oct 08, 2026</span></div>
+              <div><span class="text-[#10B981]">✓</span> Polygon Block: <span id="timeline-block">#61,420,918</span></div>
+              <div><span class="text-[#10B981]">✓</span> Cryptographic Match: 100%</div>
+            </div>
+          </div>
+
+          <!-- TAB 2: ORIGINAL DOCUMENT VIEW -->
+          <div id="html-tab-doc" class="hidden flex flex-col items-center">
+            <div class="w-full flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4 text-xs font-mono text-white/60">
+              <span>First-Page Render: <strong id="doc-view-name" class="text-white">document.pdf</strong></span>
+              <span class="text-[#10B981]">✓ POLYGON ANCHORED DOCUMENT</span>
+            </div>
+            <div class="relative w-full max-w-2xl rounded-xl overflow-hidden border border-white/20 bg-black shadow-2xl">
+              <div class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/80 backdrop-blur border border-[#10B981] text-[#10B981] text-xs font-mono font-bold flex items-center gap-1.5 shadow-xl">
+                <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                POLYGON VERIFIED
+              </div>
+              <img id="doc-preview-img" src="" alt="Certificate Preview" class="w-full h-auto object-contain hidden" />
+              <div id="doc-no-preview" class="p-12 text-center text-xs font-mono text-white/40">Visual thumbnail will generate upon PDF upload</div>
+            </div>
+          </div>
+
+          <!-- TAB 3: EXTRACTED OCR RAW TEXT -->
+          <div id="html-tab-ocr" class="hidden text-xs font-mono">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3 text-white/60">
+              <span>Extracted Text Layer From Uploaded PDF:</span>
+              <span class="text-[#10B981]">PARSED IN BROWSER</span>
+            </div>
+            <pre id="doc-raw-ocr" class="p-4 rounded-xl bg-black/60 border border-white/10 text-white/80 overflow-x-auto whitespace-pre-wrap max-h-72 leading-relaxed">No custom PDF text extracted yet.</pre>
+          </div>
+
+          <div class="mt-6 flex justify-between items-center pt-4 border-t border-white/[0.06]">
+            <button onclick="resetVerify()" class="px-5 py-2 rounded-full border border-white/20 text-xs hover:bg-white/10 transition-colors">Verify Another Document</button>
+            <a href="https://polygonscan.com" target="_blank" class="text-xs text-[#10B981] hover:underline font-mono">Inspect on PolygonScan ↗</a>
+          </div>
+        </div>
+        </div>
+
+        <!-- Unanchored / Unverified State (Amber Rejection) -->
+        <div id="unanchored-state" class="hidden rounded-2xl bg-[#0E0E10] border border-[#F59E0B]/40 p-8 shadow-2xl">
+          <div class="flex items-start gap-4 pb-6 border-b border-white/[0.08]">
+            <div class="w-12 h-12 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/30 flex items-center justify-center shrink-0">
+              <span class="text-2xl text-[#F59E0B]">⚠️</span>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-[11px] font-mono uppercase tracking-wider mb-2 font-semibold">
+                Unanchored · Not Registered on Polygon
+              </div>
+              <h3 class="text-xl sm:text-2xl font-normal text-white">
+                Document Not Found in On-Chain Registry
+              </h3>
+              <p class="mt-2 text-sm text-[#A7A6A6] leading-relaxed">
+                The calculated SHA-256 fingerprint was not found in any registered Polygon Merkle root. AI-generated certificates, Canva templates, or standard PDFs are unverified unless cryptographically anchored by an authorized institution node.
+              </p>
+            </div>
+          </div>
+
+          <div class="py-6 border-b border-white/[0.08] flex flex-col gap-4 text-xs font-mono">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5">
+                <span class="text-white/40 block text-[10px]">CANDIDATE NAME:</span>
+                <span id="unanchored-student" class="text-white text-sm font-sans font-medium">Unidentified Candidate</span>
+              </div>
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5">
+                <span class="text-white/40 block text-[10px]">COURSE / DEGREE:</span>
+                <span id="unanchored-course" class="text-white text-sm font-sans font-medium">Unspecified Course</span>
+              </div>
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5">
+                <span class="text-white/40 block text-[10px]">DETECTED ISSUER:</span>
+                <span id="unanchored-institution" class="text-[#F59E0B]">Unregistered / External Issuer</span>
+              </div>
+              <div class="p-3 rounded-xl bg-black/40 border border-white/5">
+                <span class="text-white/40 block text-[10px]">POLYGON STATUS:</span>
+                <span class="text-[#EF4444]">UNREGISTERED LEAF (0 / 1 Proofs)</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-black/60 border border-white/[0.06] flex flex-col gap-1">
+              <span class="text-white/40 text-[10px] uppercase">Calculated Document SHA-256:</span>
+              <code id="unanchored-sha256" class="text-[#FAFAFA] text-[11px] break-all">0x...</code>
+            </div>
+          </div>
+
+          <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
+            <button onclick="anchorCurrentPdf()" class="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#050505] text-xs font-medium tracking-wide hover:bg-white/90 transition-all flex items-center justify-center gap-2 shadow-lg">
+              <span>✨ Anchor Document on Polygon (Simulate Issuance)</span>
+            </button>
+            <button onclick="runSampleVerification(false)" class="w-full sm:w-auto px-5 py-3 rounded-full border border-white/20 text-xs font-medium text-white hover:bg-white/10 transition-colors">
+              <span>Try Pre-Anchored Sample</span>
+            </button>
+            <button onclick="resetVerify()" class="text-xs text-[#A7A6A6] hover:text-white font-mono">
+              Upload Another File
+            </button>
+          </div>
+        </div>
+
+        <!-- Tampered Result Card -->
+        <div id="tampered-state" class="hidden rounded-2xl bg-[#0E0E10] border border-[#EF4444]/40 p-8 shadow-2xl">
+          <div class="flex items-center gap-3 text-[#EF4444] mb-3">
+            <span class="text-2xl">⚠️</span>
+            <span class="text-xs font-mono uppercase tracking-wider font-semibold">Cryptographic Tamper Detected</span>
+          </div>
+          <h3 class="text-2xl font-normal text-white">Signature Mismatch: Document Altered Post-Issuance</h3>
+          <p class="text-sm text-[#A7A6A6] mt-2 leading-relaxed">
+            The SHA-256 fingerprint generated from this PDF does not match any authenticated leaf in the Polygon Merkle root. Content has been edited post-issuance (e.g. grade or name modified).
+          </p>
+          <div class="mt-6 p-4 rounded-xl bg-black/60 font-mono text-xs text-white/60 flex flex-col gap-1.5">
+            <div>Computed Hash: <span class="text-[#EF4444]">0x7d94...e81a (UNANCHORED)</span></div>
+            <div>Expected Root: <span class="text-white">0x89f4...38c1</span></div>
+            <div>Result: <span class="text-[#EF4444]">REJECTED (LEAF_NOT_FOUND)</span></div>
+          </div>
+          <div class="mt-6">
+            <button onclick="resetVerify()" class="px-5 py-2.5 rounded-full bg-white text-black text-xs font-medium hover:bg-white/90">Reset Verifier</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: THE PROBLEM -->
+  <!-- ============================================================ -->
+  <section id="problem" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>
+          The Problem With Legacy Credentials
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Paper fades. PDFs are edited. <br />Institutes pay the price.
+        </h2>
+        <p class="mt-4 text-base text-[#A7A6A6] leading-relaxed">
+          Millions of dollars and weeks of administrative hours are lost every year to unanchored diplomas that anyone can modify with photo editing tools.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/[0.08] hover:border-white/20 transition-all">
+          <div class="text-[10px] font-mono text-[#8B8A8A] uppercase tracking-widest mb-4">01 · CRITICAL FRAUD</div>
+          <div class="text-5xl sm:text-6xl font-light text-[#FAFAFA]">43%</div>
+          <h3 class="text-lg font-medium text-white mt-5 mb-2">Falsified Credentials</h3>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Resumes contain fabricated degrees, altered GPA records, or unaccredited completion certificates.</p>
+          <div class="mt-6 text-[10px] font-mono text-white/30 border-t border-white/[0.04] pt-3">[EDITABLE PLACEHOLDER · SHRM SURVEY]</div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/[0.08] hover:border-white/20 transition-all">
+          <div class="text-[10px] font-mono text-[#8B8A8A] uppercase tracking-widest mb-4">02 · VERIFICATION BOTTLENECK</div>
+          <div class="text-5xl sm:text-6xl font-light text-[#FAFAFA]">14 Days</div>
+          <h3 class="text-lg font-medium text-white mt-5 mb-2">Manual Verification Delays</h3>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Average turnaround time for university registrars to manually confirm alumni records via phone or email.</p>
+          <div class="mt-6 text-[10px] font-mono text-white/30 border-t border-white/[0.04] pt-3">[EDITABLE PLACEHOLDER · HR BENCHMARK]</div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/[0.08] hover:border-white/20 transition-all">
+          <div class="text-[10px] font-mono text-[#8B8A8A] uppercase tracking-widest mb-4">03 · ARCHIVAL LOSS</div>
+          <div class="text-5xl sm:text-6xl font-light text-[#FAFAFA]">68%</div>
+          <h3 class="text-lg font-medium text-white mt-5 mb-2">Vulnerable to Database Loss</h3>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Institutions rely on centralized database servers vulnerable to vendor shutdowns, bit-rot, and server outages.</p>
+          <div class="mt-6 text-[10px] font-mono text-white/30 border-t border-white/[0.04] pt-3">[EDITABLE PLACEHOLDER · ACADEMIC ARCHIVE REPORT]</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: HOW IT WORKS -->
+  <!-- ============================================================ -->
+  <section id="how-it-works" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+          Simple 3-Step Process
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          From spreadsheet to Polygon <br />in three clicks.
+        </h2>
+        <p class="mt-4 text-base text-[#A7A6A6] leading-relaxed">
+          No smart contract coding, no crypto wallets, no complex gas management.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <span class="px-2.5 py-1 bg-white text-black font-mono text-xs font-bold rounded">STEP 01</span>
+            <h3 class="text-xl font-medium text-white mt-5 mb-2">Upload CSV Spreadsheet</h3>
+            <p class="text-xs text-[#A7A6A6] leading-relaxed">Import student names, course titles, and completion dates. CertChain auto-generates high-resolution branded diplomas.</p>
+          </div>
+          <div class="mt-6 p-3 rounded-xl bg-black/60 font-mono text-[11px] text-white/60">
+            <div>✓ 2026_Graduates.csv (240 records)</div>
+            <div class="text-[#10B981] mt-1">✓ 0 validation errors</div>
+          </div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <span class="px-2.5 py-1 bg-white text-black font-mono text-xs font-bold rounded">STEP 02</span>
+            <h3 class="text-xl font-medium text-white mt-5 mb-2">Anchor on Polygon</h3>
+            <p class="text-xs text-[#A7A6A6] leading-relaxed">All certificates are hashed into a cryptographic Merkle tree. Only the single root hash is written on-chain—costing under ₹1 per 500 certs.</p>
+          </div>
+          <div class="mt-6 p-3 rounded-xl bg-black/60 font-mono text-[11px] text-white/60">
+            <div class="text-white truncate">Root: 0x89f4b6...38c1</div>
+            <div class="text-[#10B981] mt-1">✓ Block #61,420,918 Confirmed</div>
+          </div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <span class="px-2.5 py-1 bg-white text-black font-mono text-xs font-bold rounded">STEP 03</span>
+            <h3 class="text-xl font-medium text-white mt-5 mb-2">Verify Anywhere in 5s</h3>
+            <p class="text-xs text-[#A7A6A6] leading-relaxed">Graduates receive PDFs with embedded tamper-proof QR codes. Employers verify instantly in any browser without signing in.</p>
+          </div>
+          <div class="mt-6 p-3 rounded-xl bg-black/60 font-mono text-[11px] text-[#10B981]">
+            <div>✓ Instant 5-Second Match</div>
+            <div class="text-white/40 mt-1">Free for employers forever</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: FEATURES (BENTO GRID) -->
+  <!-- ============================================================ -->
+  <section id="features" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+          Platform Capabilities
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Built for scale. <br />Loved by credential teams.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">Batch Issuing with One Merkle Root</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Bundle 10,000+ certificates in a single Polygon transaction. Fraction-of-a-penny gas costs split across the entire cohort.</p>
+          </div>
+          <div class="mt-6 p-3 bg-black/50 rounded-xl font-mono text-xs text-white/70">
+            0x89f4b62d3a1e94c8b2098e77a102bc45ff72d0b31e9c8a140d38c1192834b7f0
+          </div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">Custom Templates</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Upload custom institute crests, signatures, fonts, and metallic foil styles.</p>
+          </div>
+          <div class="mt-4 font-mono text-xs text-[#10B981]">✓ Vector Sharp 600 DPI</div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">QR on Every Certificate</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Scannable by any mobile camera with instant cryptographic redirection.</p>
+          </div>
+          <div class="mt-4 font-mono text-xs text-white/50">[SCAN TO VERIFY]</div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">Instant Revocation</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Revoke fraudulent or misprinted credentials on-chain with one click.</p>
+          </div>
+          <div class="mt-4 font-mono text-xs text-[#EF4444]">STATUS: REVOKED</div>
+        </div>
+
+        <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">Bulk Email Delivery</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Automate dispatch of signed PDFs directly to alumni inboxes.</p>
+          </div>
+          <div class="mt-4 font-mono text-xs text-[#10B981]">99.8% Inbox Rate</div>
+        </div>
+
+        <div class="md:col-span-3 p-8 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 class="text-xl font-medium text-white mb-2">Developer REST & GraphQL API</h3>
+            <p class="text-sm text-[#A7A6A6] leading-relaxed">Integrate issuance directly into Moodle, Canvas, Blackboard, or internal ERPs.</p>
+          </div>
+          <div class="p-4 bg-black/60 rounded-xl font-mono text-xs text-white/80 shrink-0">
+            POST /v1/certificates/issue
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6: WHO IT'S FOR -->
+  <!-- ============================================================ -->
+  <section id="use-cases" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-14">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+          Target Sectors
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Engineered for every credential issuer.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="text-sm font-semibold text-white mb-2">Training Institutes</div>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Accelerate student hiring with verified proof of coding, design, and data science skills.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="text-sm font-semibold text-white mb-2">Colleges & Universities</div>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Eliminate transcript fraud, reduce registrar phone calls by 95%, and archive diplomas forever.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="text-sm font-semibold text-white mb-2">Hackathons & Events</div>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Distribute Polygon-anchored achievement badges to 5,000+ attendees in one transaction.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="text-sm font-semibold text-white mb-2">Internship Providers</div>
+          <p class="text-xs text-[#A7A6A6] leading-relaxed">Issue cryptographic experience letters that employers verify with mathematical certainty.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7: TRUST & SECURITY -->
+  <!-- ============================================================ -->
+  <section id="security" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="max-w-3xl mb-14">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+          Privacy Architecture
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Zero personal data on-chain. <br />Only cryptographic math.
+        </h2>
+        <p class="mt-4 text-base text-[#A7A6A6] leading-relaxed">
+          GDPR & FERPA compliant. The blockchain only ever sees anonymous SHA-256 hashes.
+        </p>
+      </div>
+
+      <div class="p-8 rounded-2xl bg-[#0E0E10] border border-white/10 grid grid-cols-1 md:grid-cols-4 gap-6 text-xs">
+        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+          <div class="font-mono text-white/40">STEP 1</div>
+          <div class="font-medium text-white mt-1 text-sm">Local PDF Document</div>
+          <div class="text-[#A7A6A6] mt-2">Generated in private institute memory. Never stored on-chain.</div>
+        </div>
+        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+          <div class="font-mono text-white/40">STEP 2</div>
+          <div class="font-medium text-white mt-1 text-sm">SHA-256 Digest</div>
+          <div class="text-[#A7A6A6] mt-2">One-way mathematical fingerprint. Impossible to reverse-engineer.</div>
+        </div>
+        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+          <div class="font-mono text-white/40">STEP 3</div>
+          <div class="font-medium text-white mt-1 text-sm">Merkle Tree</div>
+          <div class="text-[#A7A6A6] mt-2">10,000 hashes compressed into a single 32-byte root.</div>
+        </div>
+        <div class="p-4 bg-[#10B981]/10 border border-[#10B981]/30 rounded-xl">
+          <div class="font-mono text-[#10B981]">STEP 4</div>
+          <div class="font-medium text-white mt-1 text-sm">Polygon Anchor</div>
+          <div class="text-[#A7A6A6] mt-2">Only the root hash is committed to Polygon Smart Contract.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 8: PRICING -->
+  <!-- ============================================================ -->
+  <section id="pricing" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-white/10 bg-white/[0.04] text-[#A7A6A6] text-xs font-mono uppercase tracking-widest">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+          Pricing Plans
+        </div>
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Transparent plans for every scale.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Free -->
+        <div class="p-7 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="text-sm font-semibold text-white">Free</div>
+            <div class="text-4xl font-light text-white mt-3">₹0</div>
+            <div class="text-xs text-white/40 font-mono mt-1">forever free</div>
+            <ul class="mt-6 space-y-2.5 text-xs text-white/80">
+              <li>✓ 50 certificates / month</li>
+              <li>✓ Polygon L2 anchor</li>
+              <li>✓ Instant verification link</li>
+              <li>✓ Standard template</li>
+            </ul>
+          </div>
+          <a href="/signup" class="mt-8 py-3 rounded-full border border-white/20 text-xs font-medium text-center text-white hover:bg-white/10">Start Free</a>
+        </div>
+
+        <!-- Starter (Highlighted) -->
+        <div class="p-7 rounded-2xl bg-[#0E0E10] border-2 border-white/40 shadow-2xl flex flex-col justify-between relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-white text-black font-mono text-[10px] font-semibold">POPULAR</div>
+          <div>
+            <div class="text-sm font-semibold text-white">Starter</div>
+            <div class="text-4xl font-light text-white mt-3">₹499<span class="text-xs text-white/40 font-mono">/mo</span></div>
+            <div class="text-xs text-white/40 font-mono mt-1">for growing institutes</div>
+            <ul class="mt-6 space-y-2.5 text-xs text-white/80">
+              <li>✓ 500 certificates / month</li>
+              <li>✓ Custom logo & branding</li>
+              <li>✓ Automated CSV upload</li>
+              <li>✓ Embedded QR on PDFs</li>
+              <li>✓ 1-click on-chain revoke</li>
+            </ul>
+          </div>
+          <a href="/signup" class="mt-8 py-3 rounded-full bg-white text-black text-xs font-medium text-center hover:bg-white/90">Start 14-Day Trial</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="p-7 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="text-sm font-semibold text-white">Pro</div>
+            <div class="text-4xl font-light text-white mt-3">₹1,999<span class="text-xs text-white/40 font-mono">/mo</span></div>
+            <div class="text-xs text-white/40 font-mono mt-1">for colleges & academies</div>
+            <ul class="mt-6 space-y-2.5 text-xs text-white/80">
+              <li>✓ 2,500 certificates / month</li>
+              <li>✓ Automated bulk email dispatch</li>
+              <li>✓ Team roles & permissions</li>
+              <li>✓ Custom verify domain</li>
+              <li>✓ Audit logs & exports</li>
+            </ul>
+          </div>
+          <a href="/signup" class="mt-8 py-3 rounded-full border border-white/20 text-xs font-medium text-center text-white hover:bg-white/10">Get Pro Access</a>
+        </div>
+
+        <!-- Custom -->
+        <div class="p-7 rounded-2xl bg-[#0E0E10] border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="text-sm font-semibold text-white">Custom</div>
+            <div class="text-4xl font-light text-white mt-3">Custom</div>
+            <div class="text-xs text-white/40 font-mono mt-1">university systems</div>
+            <ul class="mt-6 space-y-2.5 text-xs text-white/80">
+              <li>✓ Unlimited certificates</li>
+              <li>✓ Full REST & GraphQL API</li>
+              <li>✓ LMS SIS integrations</li>
+              <li>✓ Dedicated SLA & engineer</li>
+            </ul>
+          </div>
+          <a href="/signup" class="mt-8 py-3 rounded-full border border-white/20 text-xs font-medium text-center text-white hover:bg-white/10">Contact Enterprise</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 9: FAQ -->
+  <!-- ============================================================ -->
+  <section id="faq" class="relative w-full py-28 px-6 bg-[#050505] text-[#FAFAFA] border-t border-white/[0.06]">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Frequently Asked Questions
+        </h2>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="font-medium text-white mb-2">Do I or my students need cryptocurrency or a crypto wallet?</div>
+          <div class="text-xs text-[#A7A6A6] leading-relaxed">No. CertChain abstracts all on-chain gas operations through simple fiat billing (UPI, cards). Students receive a standard PDF certificate with an embedded verification QR code.</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="font-medium text-white mb-2">What if CertChain shuts down in the future?</div>
+          <div class="text-xs text-[#A7A6A6] leading-relaxed">Your certificates remain 100% verifiable forever. Because the Merkle roots are committed immutably to Polygon's public blockchain, anyone can recompute the PDF's hash and verify it against Polygon directly using open-source tools.</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="font-medium text-white mb-2">Can certificates be faked or altered?</div>
+          <div class="text-xs text-[#A7A6A6] leading-relaxed">No. Even altering a single pixel or character in the PDF changes its SHA-256 hash completely, causing an instant cryptographic mismatch on Polygon.</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="font-medium text-white mb-2">What does verification cost for employers?</div>
+          <div class="text-xs text-[#A7A6A6] leading-relaxed">Verification is 100% free for everyone, forever. No accounts or fees required.</div>
+        </div>
+        <div class="p-6 rounded-2xl bg-[#0E0E10] border border-white/10">
+          <div class="font-medium text-white mb-2">Is student data stored on the public blockchain?</div>
+          <div class="text-xs text-[#A7A6A6] leading-relaxed">Never. Only anonymous 32-byte cryptographic SHA-256 hashes are anchored on Polygon, ensuring full compliance with GDPR and FERPA.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 10: FINAL CTA + FOOTER -->
+  <!-- ============================================================ -->
+  <footer class="relative w-full bg-[#050505] text-[#FAFAFA] border-t border-white/[0.08]">
+    <div class="relative py-28 px-6 text-center border-b border-white/[0.08] overflow-hidden">
+      <video autoplay muted loop playsinline preload="auto" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-20">
+        <source src="hero.mp4" type="video/mp4" />
+      </video>
+      <div class="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-[#050505] pointer-events-none"></div>
+
+      <div class="relative max-w-3xl mx-auto flex flex-col items-center">
+        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#FAFAFA] tracking-tight leading-[1.08]">
+          Start issuing certificates <br />nobody can fake.
+        </h2>
+        <p class="mt-4 text-base text-[#A7A6A6] leading-relaxed">
+          Set up your institute node in under 5 minutes.
+        </p>
+        <div class="mt-8 flex gap-4">
+          <a href="#pricing" class="h-12 px-8 rounded-full bg-white text-black font-medium text-sm flex items-center justify-center hover:bg-white/90 transition-all">Start Free (50 Certs/Mo)</a>
+          <a href="#verify-demo" class="h-12 px-6 flex items-center justify-center text-sm font-medium text-white/80 hover:text-white">Test Verifier →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40">
+      <div>&copy; 2026 CERTCHAIN TECHNOLOGIES. ANCHORED ON POLYGON LAYER-2.</div>
+      <div class="flex items-center gap-2 text-[#10B981]">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+        <span>POLYGON MAINNET OPERATIONAL</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <!-- ============================================================ -->
+  <script>
+    // Initialize PDF.js worker
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
+    // Sticky Navbar on Scroll
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('sticky-navbar');
+      if (window.scrollY > window.innerHeight * 0.75) {
+        nav.classList.remove('-translate-y-full', 'opacity-0');
+        nav.classList.add('translate-y-0', 'opacity-100');
+      } else {
+        nav.classList.add('-translate-y-full', 'opacity-0');
+        nav.classList.remove('translate-y-0', 'opacity-100');
+      }
+    });
+
+    // Tab Switcher
+    function switchHtmlTab(tab) {
+      const tabCard = document.getElementById('html-tab-card');
+      const tabDoc = document.getElementById('html-tab-doc');
+      const tabOcr = document.getElementById('html-tab-ocr');
+      const btnCard = document.getElementById('tab-btn-card');
+      const btnDoc = document.getElementById('tab-btn-doc');
+      const btnOcr = document.getElementById('tab-btn-ocr');
+
+      tabCard.classList.add('hidden');
+      tabDoc.classList.add('hidden');
+      tabOcr.classList.add('hidden');
+
+      btnCard.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all text-white/60 hover:text-white";
+      btnDoc.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all text-white/60 hover:text-white";
+      btnOcr.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all text-white/60 hover:text-white";
+
+      if (tab === 'card') {
+        tabCard.classList.remove('hidden');
+        btnCard.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all bg-white text-black font-medium";
+      } else if (tab === 'doc') {
+        tabDoc.classList.remove('hidden');
+        btnDoc.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all bg-white text-black font-medium";
+      } else if (tab === 'ocr') {
+        tabOcr.classList.remove('hidden');
+        btnOcr.className = "px-3 py-1 rounded-lg text-xs font-sans transition-all bg-white text-black font-medium";
+      }
+    }
+
+    // Helper: Web Crypto SHA-256 calculation
+    async function computeFileSha256(file) {
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    // Intelligent PDF.js Parser for Certificates
+    async function extractFromPdfFile(file, buffer) {
+      let rawLines = [];
+      let fullText = "";
+      let thumbDataUrl = "";
+
+      if (window.pdfjsLib) {
+        try {
+          const loadingTask = window.pdfjsLib.getDocument({ data: buffer });
+          const pdf = await loadingTask.promise;
+          const page = await pdf.getPage(1);
+
+          // Render canvas thumbnail
+          try {
+            const viewport = page.getViewport({ scale: 1.0 });
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            thumbDataUrl = canvas.toDataURL("image/png");
+          } catch (cErr) {
+            console.warn("Canvas render error:", cErr);
+          }
+
+          // Text items extraction
+          const textContent = await page.getTextContent();
+          const lineMap = new Map();
+
+          for (const item of textContent.items) {
+            if (!item.str || !item.str.trim()) continue;
+            const y = Math.round(item.transform[5]);
+            const x = Math.round(item.transform[4]);
+            const fontSize = Math.round(Math.abs(item.transform[0] || 12));
+
+            let foundY = y;
+            for (const existingY of lineMap.keys()) {
+              if (Math.abs(existingY - y) <= 4) {
+                foundY = existingY;
+                break;
+              }
+            }
+
+            if (!lineMap.has(foundY)) lineMap.set(foundY, []);
+            lineMap.get(foundY).push({ text: item.str, fontSize, x });
+          }
+
+          const sortedYs = Array.from(lineMap.keys()).sort((a, b) => b - a);
+          for (const y of sortedYs) {
+            const items = lineMap.get(y).sort((a, b) => a.x - b.x);
+            const lineText = items.map(i => i.text.trim()).join(" ");
+            const maxFont = Math.max(...items.map(i => i.fontSize));
+            if (lineText.length > 0) {
+              rawLines.push({ text: lineText, fontSize: maxFont });
+            }
+          }
+          fullText = rawLines.map(l => l.text).join("\n");
+        } catch (pdfErr) {
+          console.warn("PDF.js parsing error:", pdfErr);
+        }
+      }
+
+      // Fields detection
+      const leadInRegex = /(?:this is to certify that|certifies that|is hereby awarded to|presented to|conferred upon|proudly presented to|awarded to|certify that|granted to|has successfully completed|in recognition of|student name:?|name:?)/i;
+      const titleExclusions = /(certificate|completion|achievement|diploma|degree|excellence|participation|appreciation|university|college|academy|institute|program|accredited|authorized|signature|director|president|founder|date|verify|credential|id)/i;
+
+      let student = "";
+      let course = "";
+      let institution = "";
+      let dateStr = "";
+      let credId = "";
+
+      // 1. Recipient Name: line following lead-in
+      for (let i = 0; i < rawLines.length; i++) {
+        if (leadInRegex.test(rawLines[i].text.trim())) {
+          for (let j = i + 1; j <= Math.min(i + 2, rawLines.length - 1); j++) {
+            const candidate = rawLines[j].text.trim();
+            if (candidate.length >= 3 && candidate.length <= 40 && !titleExclusions.test(candidate)) {
+              student = candidate;
+              break;
+            }
+          }
+          if (student) break;
+        }
+      }
+
+      // Largest font size fallback for student
+      if (!student && rawLines.length > 0) {
+        const sorted = [...rawLines].sort((a, b) => b.fontSize - a.fontSize);
+        for (const item of sorted) {
+          const t = item.text.trim();
+          if (t.length >= 3 && t.length <= 36 && !titleExclusions.test(t) && !/^[0-9\W]+$/.test(t)) {
+            student = t;
+            break;
+          }
+        }
+      }
+
+      // 2. Course Title: line after course lead-in
+      const courseRegex = /(?:for completing|successfully completing|completed the|course in|program in|specialization in|degree of|field of|in the subject of|titled|for:|course:?|program:?)/i;
+      for (let i = 0; i < rawLines.length; i++) {
+        const line = rawLines[i].text.trim();
+        if (courseRegex.test(line)) {
+          const split = line.split(courseRegex);
+          if (split[1] && split[1].trim().length > 3) {
+            course = split[1].trim();
+            break;
+          }
+          if (i + 1 < rawLines.length) {
+            const next = rawLines[i + 1].text.trim();
+            if (next.length > 3 && next.length < 80 && !titleExclusions.test(next)) {
+              course = next;
+              break;
+            }
+          }
+        }
+      }
+
+      // 3. Institution
+      const instRegex = /(university|college|institute|academy|school of|google|coursera|edx|udemy|stanford|harvard|mit|iit|polytechnic|foundation|technologies)/i;
+      for (const item of rawLines) {
+        if (instRegex.test(item.text) && item.text.length < 60) {
+          institution = item.text.trim();
+          break;
+        }
+      }
+
+      // 4. Date & ID
+      const dateMatch = fullText.match(/(?:issued|date|awarded on|completed on)?\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2})/i);
+      if (dateMatch && dateMatch[1]) dateStr = dateMatch[1].trim();
+
+      const idMatch = fullText.match(/(?:credential id|certificate id|cert id|id|verification code|serial|number|no\.?):?\s*([A-Za-z0-9_-]{5,32})/i);
+      if (idMatch && idMatch[1]) credId = idMatch[1].trim();
+
+    // Set of verified on-chain hashes
+    const anchoredHashes = new Set(["e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]);
+    let currentUploadedCert = null;
+
+    // Fallbacks
+    const clean = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]+/g, " ").trim();
+    const words = clean.split(/\s+/).filter(Boolean);
+    if (!student) {
+      if (words.length >= 2 && !/^(certificate|diploma|doc|document|img|scan|untitled)$/i.test(words[0])) {
+        student = words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      } else {
+        student = "Unidentified Candidate";
+      }
+    }
+    if (!course) {
+      if (words.length > 2 && !/^(certificate|diploma|doc|document|img|scan|untitled)$/i.test(words[0])) {
+        course = words.slice(2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      } else {
+        course = "Unspecified Course / Program";
+      }
+    }
+    if (!institution) institution = "Unregistered / External Issuer";
+    if (!dateStr) dateStr = "No Issuance Date Found";
+    if (!credId) credId = "Unanchored Document (No Credential ID)";
+
+    return { student, course, institution, dateStr, credId, thumbDataUrl, fullText };
+    }
+
+    // Handle Upload via File Browser
+    function handleHtmlFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) processUploadedPdf(file, false);
+    }
+
+    // Handle Upload via Drag and Drop
+    function handleHtmlDrop(event) {
+      event.preventDefault();
+      document.getElementById('drop-zone').classList.remove('border-[#10B981]');
+      const file = event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file) processUploadedPdf(file, false);
+    }
+
+    // Main PDF Processor
+    async function processUploadedPdf(file, isTampered) {
+      const dropZone = document.getElementById('drop-zone');
+      const verifyingState = document.getElementById('verifying-state');
+      const verifiedState = document.getElementById('verified-state');
+      const unanchoredState = document.getElementById('unanchored-state');
+      const tamperedState = document.getElementById('tampered-state');
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const verifyingFileName = document.getElementById('verifying-file-name');
+
+      dropZone.classList.add('hidden');
+      verifiedState.classList.add('hidden');
+      unanchoredState.classList.add('hidden');
+      tamperedState.classList.add('hidden');
+      verifyingState.classList.remove('hidden');
+
+      verifyingFileName.innerText = file.name;
+      progressBar.style.width = '20%';
+      progressText.innerText = '20%';
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const hashHex = await computeFileSha256(file);
+        const extracted = await extractFromPdfFile(file, buffer);
+        const sizeKb = (file.size / 1024).toFixed(1) + " KB";
+        const randomBlock = "#" + (61400000 + Math.floor(Math.random() * 50000)).toLocaleString();
+
+        currentUploadedCert = { file, hashHex, extracted, sizeKb, randomBlock };
+
+        // Populate card elements with real extracted data
+        document.getElementById('notice-file-name').innerText = file.name;
+        document.getElementById('notice-file-size').innerText = sizeKb;
+        document.getElementById('uploaded-notice').classList.remove('hidden');
+        document.getElementById('card-student-name').innerText = extracted.student;
+        document.getElementById('card-course-name').innerText = extracted.course;
+        document.getElementById('card-institution').innerText = extracted.institution;
+        document.getElementById('card-metadata').innerText = `Issued: ${extracted.dateStr} · ID: ${extracted.credId}`;
+        document.getElementById('card-sha256').innerText = hashHex;
+        document.getElementById('timeline-date').innerText = extracted.dateStr;
+        document.getElementById('timeline-block').innerText = randomBlock;
+
+        // Populate unanchored state elements
+        document.getElementById('unanchored-student').innerText = extracted.student;
+        document.getElementById('unanchored-course').innerText = extracted.course;
+        document.getElementById('unanchored-institution').innerText = extracted.institution;
+        document.getElementById('unanchored-sha256').innerText = hashHex;
+
+        // Populate document view
+        document.getElementById('doc-view-name').innerText = file.name;
+        const previewImg = document.getElementById('doc-preview-img');
+        const noPreview = document.getElementById('doc-no-preview');
+        if (extracted.thumbDataUrl) {
+          previewImg.src = extracted.thumbDataUrl;
+          previewImg.classList.remove('hidden');
+          noPreview.classList.add('hidden');
+        } else {
+          previewImg.classList.add('hidden');
+          noPreview.classList.remove('hidden');
+        }
+
+        // Populate OCR text view
+        document.getElementById('doc-raw-ocr').innerText = extracted.fullText || "Visual scanned document. Client-side SHA-256 fingerprint computed.";
+
+        switchHtmlTab('card');
+
+        setTimeout(() => {
+          progressBar.style.width = '60%';
+          progressText.innerText = '60%';
+        }, 700);
+
+        setTimeout(() => {
+          progressBar.style.width = '100%';
+          progressText.innerText = '100%';
+        }, 1400);
+
+        setTimeout(() => {
+          verifyingState.classList.add('hidden');
+          if (isTampered) {
+            tamperedState.classList.remove('hidden');
+          } else if (anchoredHashes.has(hashHex)) {
+            verifiedState.classList.remove('hidden');
+          } else {
+            unanchoredState.classList.remove('hidden');
+          }
+        }, 2000);
+
+      } catch (err) {
+        console.error("PDF processing error:", err);
+        runSampleVerification(isTampered);
+      }
+    }
+
+    // Anchor current document to Polygon
+    function anchorCurrentPdf() {
+      if (!currentUploadedCert) return;
+      anchoredHashes.add(currentUploadedCert.hashHex);
+
+      const officialId = "CC-" + new Date().getFullYear() + "-" + Math.floor(10000 + Math.random() * 90000);
+      const today = new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+      const inst = currentUploadedCert.extracted.institution.includes("Unregistered") ? "Authorized Institute Node #04" : currentUploadedCert.extracted.institution;
+
+      document.getElementById('card-institution').innerText = inst;
+      document.getElementById('card-metadata').innerText = `Issued: ${today} · ID: ${officialId}`;
+      document.getElementById('timeline-date').innerText = today;
+
+      document.getElementById('unanchored-state').classList.add('hidden');
+      document.getElementById('verified-state').classList.remove('hidden');
+    }
+
+    // Sample Verifications (Sarah M. Jenkins / Tampered)
+    function runSampleVerification(isTampered) {
+      const dropZone = document.getElementById('drop-zone');
+      const verifyingState = document.getElementById('verifying-state');
+      const verifiedState = document.getElementById('verified-state');
+      const unanchoredState = document.getElementById('unanchored-state');
+      const tamperedState = document.getElementById('tampered-state');
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const verifyingFileName = document.getElementById('verifying-file-name');
+
+      dropZone.classList.add('hidden');
+      verifiedState.classList.add('hidden');
+      unanchoredState.classList.add('hidden');
+      tamperedState.classList.add('hidden');
+      verifyingState.classList.remove('hidden');
+
+      verifyingFileName.innerText = isTampered ? "tampered-diploma-modified.pdf" : "certchain-verified-sample.pdf";
+
+      // Reset to default sample text
+      document.getElementById('uploaded-notice').classList.add('hidden');
+      document.getElementById('card-student-name').innerText = "Sarah M. Jenkins";
+      document.getElementById('card-course-name').innerText = "Advanced Distributed Systems & Cryptographic Proofs";
+      document.getElementById('card-institution').innerText = "Stanford Credentials Office";
+      document.getElementById('card-metadata').innerText = "Issued: Oct 08, 2026 · ID: CC-2026-94812";
+      document.getElementById('card-sha256').innerText = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+      document.getElementById('timeline-date').innerText = "Oct 08, 2026";
+      document.getElementById('timeline-block').innerText = "#61,420,918";
+
+      switchHtmlTab('card');
+
+      progressBar.style.width = '30%';
+      progressText.innerText = '30%';
+
+      setTimeout(() => {
+        progressBar.style.width = '70%';
+        progressText.innerText = '70%';
+      }, 700);
+
+      setTimeout(() => {
+        progressBar.style.width = '100%';
+        progressText.innerText = '100%';
+      }, 1400);
+
+      setTimeout(() => {
+        verifyingState.classList.add('hidden');
+        if (isTampered) {
+          tamperedState.classList.remove('hidden');
+        } else {
+          verifiedState.classList.remove('hidden');
+        }
+      }, 1900);
+    }
+
+    // Card Editing
+    function toggleCardEdit(isEditing) {
+      const viewMode = document.getElementById('view-mode-details');
+      const editMode = document.getElementById('edit-mode-details');
+      const studentInput = document.getElementById('edit-student-input');
+      const courseInput = document.getElementById('edit-course-input');
+
+      if (isEditing) {
+        studentInput.value = document.getElementById('card-student-name').innerText;
+        courseInput.value = document.getElementById('card-course-name').innerText;
+        viewMode.classList.add('hidden');
+        editMode.classList.remove('hidden');
+        studentInput.focus();
+      } else {
+        viewMode.classList.remove('hidden');
+        editMode.classList.add('hidden');
+      }
+    }
+
+    function saveCardEdit() {
+      const studentInput = document.getElementById('edit-student-input');
+      const courseInput = document.getElementById('edit-course-input');
+
+      if (studentInput.value.trim()) {
+        document.getElementById('card-student-name').innerText = studentInput.value.trim();
+      }
+      if (courseInput.value.trim()) {
+        document.getElementById('card-course-name').innerText = courseInput.value.trim();
+      }
+      toggleCardEdit(false);
+    }
+
+    function resetVerify() {
+      document.getElementById('drop-zone').classList.remove('hidden');
+      document.getElementById('verifying-state').classList.add('hidden');
+      document.getElementById('verified-state').classList.add('hidden');
+      document.getElementById('unanchored-state').classList.add('hidden');
+      document.getElementById('tampered-state').classList.add('hidden');
+      toggleCardEdit(false);
+      switchHtmlTab('card');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "batches": [
+    {
+      "id": "BATCH-2026-092",
+      "course": "B.Tech Computer Science & AI (2026)",
+      "count": 240,
+      "root": "0x89f4b62d3a1e94c8b2098e77a102bc45ff72d0b31e9c8a140d38c1192834b7f0",
+      "block": "61420918",
+      "status": "ANCHORED",
+      "date": "Oct 12, 2026",
+      "txHash": "0x5c72e94b812ef9481920384b1209348bc48209418294018294819204882ea814"
+    },
+    {
+      "id": "BATCH-2026-091",
+      "course": "Executive Data Science Masters",
+      "count": 85,
+      "root": "0x32e1a89c92bfa04412ef8941098cbef320914c81048b99182049814bf994812a",
+      "block": "61380410",
+      "status": "ANCHORED",
+      "date": "Oct 05, 2026",
+      "txHash": "0x4a82b01938fc10948b209418294018294819204882ea814018294819204882ea"
+    },
+    {
+      "id": "BATCH-2026-090",
+      "course": "Full-Stack Web3 Fellowship",
+      "count": 150,
+      "root": "0x17c0948b812ef9481920384b1209348bc48209418294018294819204882ea814",
+      "block": "61290114",
+      "status": "ANCHORED",
+      "date": "Sep 28, 2026",
+      "txHash": "0x7d94e81a38fc10948b209418294018294819204882ea814018294819204882ea"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "CC-2026-94812",
+      "name": "Sarah M. Jenkins",
+      "email": "sarah.jenkins@alumni.stanford.edu",
+      "course": "Advanced Distributed Systems & Applied Cryptography",
+      "grade": "Summa Cum Laude (GPA 4.0)",
+      "issueDate": "Oct 08, 2026",
+      "status": "ACTIVE",
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "batchId": "BATCH-2026-092",
+      "blockNumber": "61420918"
+    },
+    {
+      "id": "CC-2026-94813",
+      "name": "Alexander Vance",
+      "email": "avance@alumni.stanford.edu",
+      "course": "B.Tech Computer Science & AI (2026)",
+      "grade": "First Class with Distinction",
+      "issueDate": "Oct 12, 2026",
+      "status": "ACTIVE",
+      "hash": "7d94e81a38fc10948b209418294018294819204882ea814018294819204882ea",
+      "batchId": "BATCH-2026-092",
+      "blockNumber": "61420918"
+    },
+    {
+      "id": "CC-2026-94814",
+      "name": "Maya Lin Chen",
+      "email": "m.chen@alumni.stanford.edu",
+      "course": "B.Tech Computer Science & AI (2026)",
+      "grade": "Magna Cum Laude",
+      "issueDate": "Oct 12, 2026",
+      "status": "ACTIVE",
+      "hash": "4a82b01938fc10948b209418294018294819204882ea814018294819204882ea",
+      "batchId": "BATCH-2026-092",
+      "blockNumber": "61420918"
+    },
+    {
+      "id": "CC-2026-94815",
+      "name": "Devon M. Reynolds",
+      "email": "devon.reynolds@alumni.stanford.edu",
+      "course": "B.Tech Computer Science & AI (2026)",
+      "grade": "Honors Distinction",
+      "issueDate": "Oct 12, 2026",
+      "status": "REVOKED",
+      "hash": "89fcb1048b209418294018294819204882ea814018294819204882ea38fc1094",
+      "batchId": "BATCH-2026-092",
+      "blockNumber": "61420918"
+    }
+  ]
+}

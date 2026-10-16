@@ -1,0 +1,87 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@200;300;400;500;600&family=Manrope:wght@400;500;700&family=Sora:wght@200;300;400;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #050505;
+  --surface: #0E0E10;
+  --ink: #FAFAFA;
+  --muted: #A7A6A6;
+  --nav: #B6B5B5;
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* Fonts with web-safe fallbacks */
+  --font-manrope: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-instrument-serif: "Instrument Serif", Georgia, Cambria, serif;
+  --font-jetbrains-mono: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  --font-sora: "Sora", -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Reference canvas 1487 x 1058 */
+  --u: calc(100dvh / 1058);
+  --uw: calc(100vw / 1487);
+  --h: clamp(var(--u), calc(var(--u) * 0.65 + var(--uw) * 0.35), calc(var(--u) * 1.16));
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #050505;
+  color: #FAFAFA;
+}
+
+body {
+  background-color: #050505;
+  color: #FAFAFA;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FAFAFA;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dual layout for pixel-accurate desktop reference canvas vs mobile flow */
+.hero-desktop-canvas {
+  display: none;
+}
+.hero-mobile-canvas {
+  display: flex;
+}
+
+@media (min-width: 900px) and (min-aspect-ratio: 11/10) {
+  .hero-desktop-canvas {
+    display: block;
+  }
+  .hero-mobile-canvas {
+    display: none;
+  }
+}
+

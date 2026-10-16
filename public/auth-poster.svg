@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <radialGradient id="authPortal" cx="42%" cy="46%" r="38%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="20%" stop-color="#cbd5e1" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#0e1726" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="beamGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="65%" stop-color="#e2e8f0" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="scrimRight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#050505" stop-opacity="0.2"/>
+      <stop offset="45%" stop-color="#050505" stop-opacity="0.6"/>
+      <stop offset="75%" stop-color="#050505" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#050505" />
+  <circle cx="800" cy="480" r="540" fill="url(#authPortal)" />
+  <rect x="792" y="220" width="16" height="420" fill="url(#beamGrad)" />
+  <ellipse cx="800" cy="640" rx="500" ry="25" fill="#0b0e14" opacity="0.65" />
+  <ellipse cx="800" cy="610" rx="4.5" ry="5.5" fill="#050505" />
+  <path d="M795 617 L805 617 L803 642 L797 642 Z" fill="#050505" />
+  <rect width="100%" height="100%" fill="url(#scrimRight)" />
+</svg>
