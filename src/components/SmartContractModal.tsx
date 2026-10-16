@@ -315,6 +315,64 @@ export function MerklePathVisualizer({
             == EQUAL
           </span>
         </div>
+
+        {/* W3C Verifiable Credential v2.0 JSON-LD Export */}
+        <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[10px] text-white/40">
+            W3C Verifiable Credentials Data Model v2.0 · Ed25519 / Secp256k1 MerkleProof2026
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const vcPayload = {
+                "@context": [
+                  "https://www.w3.org/ns/credentials/v2",
+                  "https://w3id.org/security/suites/merkle-2026/v1",
+                ],
+                id: `urn:uuid:${credentialId.toLowerCase()}`,
+                type: ["VerifiableCredential", "AcademicDegreeCredential"],
+                issuer: {
+                  id: `did:ethr:polygon:${CERTCHAIN_CONTRACT_ADDRESS}`,
+                  name: "Stanford Credentials Office (CertChain Node #04)",
+                },
+                validFrom: new Date().toISOString(),
+                credentialSubject: {
+                  id: `urn:certchain:credential:${credentialId}`,
+                  credentialId,
+                  pdfSha256Digest: `0x${cleanLeaf}`,
+                },
+                proof: {
+                  type: "PolygonMerkleProof2026",
+                  chainId: 137,
+                  network: "Polygon PoS Mainnet",
+                  contractAddress: CERTCHAIN_CONTRACT_ADDRESS,
+                  batchId: batchId || "BATCH-2026-092",
+                  blockNumber: blockNumber || "61420918",
+                  merkleRoot: rootDisplay,
+                  merklePath: [
+                    { position: "right", hash: `0x${siblingHash}` },
+                    { position: "parent", hash: `0x${intermediateNode}` },
+                  ],
+                },
+              };
+              const blob = new Blob([JSON.stringify(vcPayload, null, 2)], {
+                type: "application/ld+json",
+              });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${credentialId}.vc.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(url), 3000);
+            }}
+            className="px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/15 border border-white/15 text-white text-[10px] font-mono transition-colors flex items-center gap-1.5"
+          >
+            <Code2 className="w-3 h-3 text-[#10B981]" />
+            <span>Export W3C VC (.vc.json)</span>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -752,6 +752,13 @@ export default function DashboardPage() {
               <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
             <Link
+              href="/docs"
+              className="px-4 py-2.5 rounded-full border border-white/15 text-xs font-medium text-white/80 hover:text-white hover:border-white/40 transition-colors flex items-center gap-1.5"
+            >
+              <span>API Docs</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
               href="/verify"
               className="px-4 py-2.5 rounded-full border border-white/15 text-xs font-medium text-white/80 hover:text-white hover:border-white/40 transition-colors flex items-center gap-1.5"
             >

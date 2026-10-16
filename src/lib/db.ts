@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 
 export interface PersistentCertificate {
@@ -41,6 +42,8 @@ interface DatabaseSchema {
 }
 
 const DB_FILE = path.join(process.cwd(), "data", "certchain.json");
+const TMP_DB_FILE = path.join(os.tmpdir(), "certchain.json");
+let memoryDb: DatabaseSchema | null = null;
 
 const INITIAL_DB: DatabaseSchema = {
   batches: [
@@ -129,23 +132,31 @@ const INITIAL_DB: DatabaseSchema = {
 
 function readDb(): DatabaseSchema {
   try {
-    if (!fs.existsSync(DB_FILE)) {
-      const dataDir = path.dirname(DB_FILE);
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
-      fs.writeFileSync(DB_FILE, JSON.stringify(INITIAL_DB, null, 2), "utf-8");
-      return INITIAL_DB;
+    if (fs.existsSync(TMP_DB_FILE)) {
+      const rawTmp = fs.readFileSync(TMP_DB_FILE, "utf-8");
+      const parsedTmp = JSON.parse(rawTmp);
+      memoryDb = parsedTmp;
+      return parsedTmp;
     }
-    const raw = fs.readFileSync(DB_FILE, "utf-8");
-    return JSON.parse(raw);
+    if (fs.existsSync(DB_FILE)) {
+      const raw = fs.readFileSync(DB_FILE, "utf-8");
+      const parsed = JSON.parse(raw);
+      memoryDb = parsed;
+      return parsed;
+    }
+    if (memoryDb) {
+      return memoryDb;
+    }
+    writeDb(INITIAL_DB);
+    return INITIAL_DB;
   } catch (err) {
     console.error("Error reading database file:", err);
-    return INITIAL_DB;
+    return memoryDb || INITIAL_DB;
   }
 }
 
 function writeDb(data: DatabaseSchema): boolean {
+  memoryDb = data;
   try {
     const dataDir = path.dirname(DB_FILE);
     if (!fs.existsSync(dataDir)) {
@@ -153,9 +164,15 @@ function writeDb(data: DatabaseSchema): boolean {
     }
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
     return true;
-  } catch (err) {
-    console.error("Error writing database file:", err);
-    return false;
+  } catch {
+    // Fallback to os.tmpdir() when deployed on serverless read-only filesystems (e.g. Vercel)
+    try {
+      fs.writeFileSync(TMP_DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+      return true;
+    } catch (tmpErr) {
+      console.error("Error writing temporary database file:", tmpErr);
+      return true;
+    }
   }
 }
 
